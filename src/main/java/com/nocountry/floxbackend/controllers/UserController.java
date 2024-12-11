@@ -23,9 +23,9 @@ public class UserController
     }
 
     @GetMapping("/")
-    public String greet(HttpServletRequest request)
+    public String greet()
     {
-        return "Welcome to main page "+request.getSession().getId();
+        return "Welcome to main page ";
     }
 
     @PostMapping("/login")

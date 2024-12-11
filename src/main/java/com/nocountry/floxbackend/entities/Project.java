@@ -33,9 +33,24 @@ public class Project
     private LocalDateTime startDate;
 
     @NotNull
-    @FutureOrPresent
-    @PastOrPresent(message = "End date must be after start date.")
+    @Future(message = "End date must be after start date.")
+    //@PastOrPresent
     private LocalDateTime endDate;
+
+    @NotNull
+    private Double budget;
+
+    @NotNull
+    @Min(0)
+    @Max(100)
+    private Double completionPercentage;
+
+    @ManyToOne
+    @JoinColumn(name = "creator_id", nullable = false)
+    private FloxUser creator;
+
+    @OneToMany(mappedBy = "project")
+    private List<Task> tasks;
 
     @ManyToMany
     @JoinTable(
@@ -44,11 +59,4 @@ public class Project
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<FloxUser> members;
-
-    @ManyToOne
-    @JoinColumn(name = "creator_id", nullable = false)
-    private FloxUser creator;
-
-    @OneToMany(mappedBy = "project")
-    private List<Task> tasks;
 }

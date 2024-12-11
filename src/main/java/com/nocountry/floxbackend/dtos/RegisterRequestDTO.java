@@ -21,10 +21,7 @@ public class RegisterRequestDTO
 
     @NotBlank
     @Size(min = 5, message = "Password must be at least 5 characters long")
-    @Pattern(
-            regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)[A-Za-z\\d@$!%*?&#]{5,}$",
-            message = "Password must be at least 5 characters long and contain at least one uppercase letter, one lowercase letter, and one digit"
-    )
     private String password;
+
     private UserRole userRole;
 }

@@ -1,6 +1,9 @@
 package com.nocountry.floxbackend.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.nocountry.floxbackend.enums.UserRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -12,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name="flox_users")
@@ -38,12 +42,20 @@ public class FloxUser
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
+
     @OneToMany(mappedBy = "creator")
-    private List<Project> createdProjects;
+
+    private Set<Project> createdProjects;
+
+    @ManyToMany(mappedBy = "members")
+
+    private Set<Project> projects;
 
     @OneToMany(mappedBy = "assignee")
-    private List<Task> assignedTasks;
+
+    private Set<Task> assignedTasks;
 
     @OneToMany(mappedBy = "author")
-    private List<Comment> comments;
+
+    private Set<Comment> comments;
 }

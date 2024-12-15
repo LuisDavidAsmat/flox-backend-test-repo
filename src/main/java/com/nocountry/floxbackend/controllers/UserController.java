@@ -22,11 +22,6 @@ public class UserController
         this.tokenBlacklistService = tokenBlacklistService;
     }
 
-    @GetMapping("/")
-    public String greet()
-    {
-        return "Welcome to main page ";
-    }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(
@@ -54,9 +49,11 @@ public class UserController
     {
 
         System.out.println(tokenHeader);
-        if (tokenHeader != null && tokenHeader.startsWith("Bearer ")) {
+        if (tokenHeader != null && tokenHeader.startsWith("Bearer "))
+        {
             String token = tokenHeader.substring(7);
             tokenBlacklistService.blacklistToken(token);
+
             return ResponseEntity.ok("Logged out successfully.");
         }
         return ResponseEntity.badRequest().body("Invalid token.");
@@ -72,9 +69,4 @@ public class UserController
     public ResponseEntity<String> getUserProfile()
     { return ResponseEntity.ok("Welcome to your profile!, user"); }
 
-    @GetMapping("/how")
-    public String howAreYou(HttpServletRequest request)
-    {
-        return "How are you page. " + request.getSession().getId();
-    }
 }

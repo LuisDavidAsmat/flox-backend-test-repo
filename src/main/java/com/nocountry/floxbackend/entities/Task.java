@@ -1,5 +1,8 @@
 package com.nocountry.floxbackend.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.nocountry.floxbackend.enums.TaskStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.FutureOrPresent;
@@ -12,6 +15,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "tasks")
@@ -31,22 +35,25 @@ public class Task
     private String description;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     private TaskStatus taskStatus;
 
     @NotNull
-    @FutureOrPresent
-    @PastOrPresent(message = "Due date must be in the past for completed tasks")
+    @FutureOrPresent(message = "Due date must be in the future")
     private LocalDateTime dueDate;
 
     @ManyToOne
     @JoinColumn(name = "project_id", nullable = false)
+    @JsonBackReference
     private Project project;
 
     @ManyToOne
     @JoinColumn(name = "assignee_id")
+
     private FloxUser assignee;
 
     @OneToMany(mappedBy = "task")
-    private List<Comment> commentList;
+
+    private Set<Comment> commentList;
 }
 

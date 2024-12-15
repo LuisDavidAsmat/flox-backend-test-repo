@@ -1,5 +1,8 @@
 package com.nocountry.floxbackend.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -8,6 +11,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "projects")
@@ -47,10 +51,12 @@ public class Project
 
     @ManyToOne
     @JoinColumn(name = "creator_id", nullable = false)
+
     private FloxUser creator;
 
     @OneToMany(mappedBy = "project")
-    private List<Task> tasks;
+    @JsonManagedReference
+    private Set<Task> tasks;
 
     @ManyToMany
     @JoinTable(
@@ -58,5 +64,6 @@ public class Project
             joinColumns = @JoinColumn(name = "project_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private List<FloxUser> members;
+
+    private Set<FloxUser> members;
 }

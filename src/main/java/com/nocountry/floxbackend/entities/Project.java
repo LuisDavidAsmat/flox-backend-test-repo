@@ -33,7 +33,7 @@ public class Project
     private String description;
 
     @NotNull
-    @PastOrPresent
+    @FutureOrPresent
     private LocalDateTime startDate;
 
     @NotNull
@@ -54,7 +54,7 @@ public class Project
 
     private FloxUser creator;
 
-    @OneToMany(mappedBy = "project")
+    @OneToMany(mappedBy = "project", cascade = CascadeType.MERGE, orphanRemoval = true)
     @JsonManagedReference
     private Set<Task> tasks;
 

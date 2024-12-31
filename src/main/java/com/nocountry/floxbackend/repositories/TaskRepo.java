@@ -10,4 +10,6 @@ public interface TaskRepo extends JpaRepository<Task, Long>
 {
 
     Task findUserByTitle(String Title);
+
+    Task findByTitle(String taskTitle);
 }

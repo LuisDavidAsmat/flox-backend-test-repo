@@ -1,5 +1,6 @@
 package com.nocountry.floxbackend.repositories;
 
+import com.nocountry.floxbackend.entities.FloxUser;
 import com.nocountry.floxbackend.entities.Project;
 import com.nocountry.floxbackend.entities.ProjectProjection;
 import jakarta.validation.OverridesAttribute;
@@ -29,6 +30,13 @@ public interface ProjectRepo extends JpaRepository<Project, Long>
             "LEFT JOIN FETCH p.tasks " +
             "LEFT JOIN FETCH p.members")
     List<Project> findAllProjectsWithAssociations();
+
+    @Query("SELECT DISTINCT p FROM Project p " +
+            "LEFT JOIN FETCH p.creator " +
+            "LEFT JOIN FETCH p.tasks " +
+            "LEFT JOIN FETCH p.members " +
+            "WHERE p.id = :projectId")
+    Optional<Project> findProjectWithAssociations(@Param("projectId") Long projectId);
 
     @Query("SELECT p.id AS id, " +
             "p.name AS name, " +
@@ -61,4 +69,6 @@ public interface ProjectRepo extends JpaRepository<Project, Long>
     @Query("SELECT m.username FROM FloxUser m JOIN m.projects p WHERE p.id = :projectId")
     Set<String> findMemberUsernameByProjectId(Long projectId);
 
+    @Query("SELECT p FROM Project p JOIN p.creator u WHERE u = :floxUser")
+    List<Project> findProjectByUser(@Param("floxUser") FloxUser finalFloxUser);
 }

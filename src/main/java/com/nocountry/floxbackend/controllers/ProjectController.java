@@ -2,6 +2,7 @@ package com.nocountry.floxbackend.controllers;
 
 
 import com.nocountry.floxbackend.dtos.ProjectDTO;
+import com.nocountry.floxbackend.dtos.ProjectDTO2;
 import com.nocountry.floxbackend.entities.Project;
 import com.nocountry.floxbackend.entities.ProjectProjection;
 import com.nocountry.floxbackend.services.ProjectService;
@@ -60,6 +61,47 @@ public class ProjectController
         }
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> viewProject (@PathVariable Long id)
+    {
+        try
+        {
+            ProjectDTO project = projectServ.findProjectById(id);
+
+            if (project == null)
+            {
+                return ResponseEntity.noContent().build();
+            }
+
+            return ResponseEntity.ok(project);
+        }
+        catch (Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getLocalizedMessage());
+        }
+    }
+
+    @GetMapping("/info/{id}")
+    public ResponseEntity<?> viewMoreInfoProject (@PathVariable Long id)
+    {
+        try
+        {
+            ProjectDTO2 project = projectServ.findProjectById2(id);
+
+            if (project == null)
+            {
+                return ResponseEntity.noContent().build();
+            }
+
+            return ResponseEntity.ok(project);
+        }
+        catch (Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getLocalizedMessage());
+        }
+    }
+
+
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateProject (@PathVariable Long id,
@@ -67,7 +109,7 @@ public class ProjectController
     {
         try
         {
-            ProjectDTO updatedProject = projectServ.updateProject(id,projectDetails);
+            ProjectDTO updatedProject = projectServ.updateProject(id, projectDetails);
 
             if (updatedProject == null)
             {
@@ -82,7 +124,7 @@ public class ProjectController
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteProject (@PathVariable Long id)
     {
         try
@@ -96,6 +138,4 @@ public class ProjectController
             return ResponseEntity.noContent().build();
         }
     }
-
-
 }

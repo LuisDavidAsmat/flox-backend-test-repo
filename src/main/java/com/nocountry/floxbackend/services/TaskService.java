@@ -13,9 +13,11 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -69,13 +71,42 @@ public class TaskService
         return taskDTO;
     }
 
+    @Transactional
     @PostMapping
-    public TaskDTO createTask(@RequestBody TaskDTO taskDTO) {
-        Task task = modelMapper.map(taskDTO, Task.class);
+    public TaskDTO createTask(@RequestBody TaskDTO taskDTO)
+    {
+        logger.info("Task id{}\n\n", taskDTO.getId());
+        //Task task = modelMapper.map(taskDTO, Task.class);
+
+        Task task = new Task();
+
+        task.setTitle(taskDTO.getTitle());
+        task.setDescription(taskDTO.getDescription());
+        task.setTaskStatus(taskDTO.getTaskStatus());
+        task.setDueDate(taskDTO.getDueDate());
+
+        Optional<Project> project = projectRepo.findById(taskDTO.getProjectId());
+        Project taskProject = new Project();
+        if (project.isPresent())
+        {
+            taskProject = project.get();
+        }
+        task.setProject(taskProject);
+
+        Optional<FloxUser> floxUser = floxUserRepo.findByUsername(taskDTO.getAssigneeName());
+        FloxUser taskAssignee = new FloxUser();
+        if (floxUser.isPresent())
+        {
+            taskAssignee = floxUser.get();
+        }
+        task.setAssignee(taskAssignee);
+
+
         Task savedTask = taskRepo.save(task);
         return modelMapper.map(savedTask, TaskDTO.class);
     }
 
+    @Transactional
     @PutMapping("/{id}")
     public TaskDTO updateTask(@PathVariable Long id, @RequestBody TaskDTO taskDTO) {
         Task task = taskRepo.findById(id)
@@ -111,14 +142,17 @@ public class TaskService
         {
             updatedTaskDTO.setAssigneeName(task.getAssignee().getUsername());
         }
-
+        logger.info("task updated?\n\n");
         return updatedTaskDTO;
     }
 
+    @Transactional
     @DeleteMapping("/delete/{id}")
-    public void deleteTask(@PathVariable Long id) {
+    public void deleteTask(@PathVariable Long id)
+    {
         Task task = taskRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found with id " + id));
+
         taskRepo.delete(task);
     }
 }

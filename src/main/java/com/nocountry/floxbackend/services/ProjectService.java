@@ -1,7 +1,10 @@
 package com.nocountry.floxbackend.services;
 
 
+import com.nocountry.floxbackend.dtos.FloxUserDTO;
 import com.nocountry.floxbackend.dtos.ProjectDTO;
+import com.nocountry.floxbackend.dtos.ProjectDTO2;
+import com.nocountry.floxbackend.dtos.TaskDTO;
 import com.nocountry.floxbackend.entities.*;
 import com.nocountry.floxbackend.repositories.FloxUserRepo;
 import com.nocountry.floxbackend.repositories.ProjectRepo;
@@ -130,6 +133,7 @@ public class ProjectService
 
         Project updatedProject = projectRepo.save(project);
 
+
         Set<String> tasks = projectRepo.findTaskTitlesProjectId(id);
         Set<String> members = projectRepo.findMemberUsernameByProjectId(id);
 
@@ -153,5 +157,134 @@ public class ProjectService
                 .orElseThrow( () -> new RuntimeException("Project was not found with id: " + id));
 
         projectRepo.delete(project);
+    }
+
+    public ProjectDTO findProjectById(Long id)
+    {
+        //Optional<Project> optionalProject = projectRepo.findById(id);
+        Optional<ProjectProjection> projectProjection = projectRepo.findProjectProjectionById(id);
+
+        if (projectProjection.isPresent())
+        {
+            ProjectProjection project = projectProjection.get();
+
+            Set<String> tasks = projectRepo.findTaskTitlesProjectId(id);
+            Set<String> members = projectRepo.findMemberUsernameByProjectId(id);
+
+            return new ProjectDTO(
+                    project.getId(),
+                    project.getName(),
+                    project.getDescription(),
+                    project.getStartDate(),
+                    project.getEndDate(),
+                    project.getBudget(),
+                    project.getCompletionPercentage(),
+                    project.getCreatorName(),
+                    tasks,
+                    members
+            );
+        }
+
+        return null;
+    }
+
+    public ProjectDTO2 findProjectById2(Long id)
+    {
+        //Optional<Project> optionalProject = projectRepo.findById(id);
+        Optional<Project> projectProjection = projectRepo.findProjectWithAssociations(id);
+
+        if (projectProjection.isPresent())
+        {
+            Project project = projectProjection.get();
+
+            FloxUserDTO floxUserDTO = new FloxUserDTO();
+
+            floxUserDTO.setUserId(project.getCreator().getUserId());
+            floxUserDTO.setUsername(project.getCreator().getUsername());
+            floxUserDTO.setEmail(project.getCreator().getEmail());
+            floxUserDTO.setUserRole(project.getCreator().getUserRole());
+
+            Set<TaskDTO> taskDTOS = project.getTasks().stream()
+                    .map(task -> new TaskDTO(
+                            task.getId(),
+                            task.getTitle(),
+                            task.getDescription(),
+                            task.getTaskStatus(),
+                            task.getDueDate(),
+                            task.getProject().getId(),
+                            task.getProject().getName(),
+                            task.getAssignee().getUserId(),
+                            task.getAssignee().getUsername()
+                    ))
+                    .collect(Collectors.toSet());
+
+            Set<FloxUserDTO> members =  project.getMembers().stream()
+                    .map(
+                            member -> new FloxUserDTO(
+                                    member.getUserId(),
+                                    member.getUsername(),
+                                    member.getEmail(),
+                                    member.getUserRole()
+                            ))
+                    .collect(Collectors.toSet());
+
+
+            return new ProjectDTO2(
+                    project.getId(),
+                    project.getName(),
+                    project.getDescription(),
+                    project.getStartDate(),
+                    project.getEndDate(),
+                    project.getBudget(),
+                    project.getCompletionPercentage(),
+                    floxUserDTO,
+//                    project.getCreator().getUserId(),
+//                    project.getCreator().getUsername(),
+                    taskDTOS,
+                    members
+
+            );
+        }
+
+        return null;
+    }
+
+
+
+    public List<ProjectDTO> findProjectsByUsersEmail(String userEmail)
+    {
+        FloxUser floxUser = floxUserRepo.findByEmail(userEmail);
+
+        if (floxUser == null)
+        {
+            return null;
+        }
+
+
+        List<Project> projectsbyUser = projectRepo.findProjectByUser(floxUser);
+
+       // return projectsbyUser;
+
+        return projectsbyUser.stream().map(
+                project ->
+                {
+                    Set<String> tasks = projectRepo.findTaskTitlesProjectId(project.getId());
+                    Set<String> members = projectRepo.findMemberUsernameByProjectId(project.getId());
+
+                    return new ProjectDTO(
+                            project.getId(),
+                            project.getName(),
+                            project.getDescription(),
+                            project.getStartDate(),
+                            project.getEndDate(),
+                            project.getBudget(),
+                            project.getCompletionPercentage(),
+                            project.getCreator().getUsername(),
+                            tasks,
+                            members
+                    );
+
+                }).toList();
+
     }
 }

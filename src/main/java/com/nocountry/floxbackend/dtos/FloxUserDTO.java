@@ -21,4 +21,12 @@ public class FloxUserDTO {
      private Set<ProjectDTO> createdProjects;
      private Set<TaskDTO> assignedTasks;
      private Set<CommentDTO> comments;
+
+    public FloxUserDTO(Long userId, String username, String email, UserRole userRole)
+    {
+        this.userId = userId;
+        this.username = username;
+        this.email = email;
+        this.userRole = userRole;
+    }
 }

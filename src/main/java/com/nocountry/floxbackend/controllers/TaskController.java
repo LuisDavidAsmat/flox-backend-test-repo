@@ -28,8 +28,17 @@ public class TaskController
     }
 
     @PostMapping("/create")
-    public TaskDTO createTask(@RequestBody TaskDTO taskDTO) {
-        return taskService.createTask(taskDTO);
+    public TaskDTO createTask(@RequestBody TaskDTO taskDTO)
+    {
+        try
+        {
+            return taskService.createTask(taskDTO);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+
+
+
     }
 
     @PutMapping("/update/{id}")

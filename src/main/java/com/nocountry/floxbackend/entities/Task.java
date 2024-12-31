@@ -28,6 +28,9 @@ public class Task
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+//    @Version
+//    private Integer version = 0;
+
     @NotBlank
     private String title;
 
